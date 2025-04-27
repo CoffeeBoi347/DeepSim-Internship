@@ -5,6 +5,9 @@ public class PlayerController : MonoBehaviour
     [Header("Speed Values")]
 
     public float velocity;
+    private float moveInputVertical;
+    private float moveInputHorizontal;
+    public bool isMoving = false;
 
     [Header("Components")]
 
@@ -18,14 +21,27 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         InputControls();
+        PlayerMovement();
     }
 
     private void InputControls()
     {
-        float moveInputVertical = Input.GetAxis("Vertical"); // for smoothened movement (W or S)
-        float moveInputHorizontal = Input.GetAxis("Horizontal"); // for smoothened movement (A or D)
+        moveInputVertical = Input.GetAxis("Vertical"); // for smoothened movement (W or S)
+        moveInputHorizontal = Input.GetAxis("Horizontal"); // for smoothened movement (A or D)
         rb.velocity = new Vector3(moveInputHorizontal * velocity * Time.deltaTime, 0f, moveInputVertical * velocity * Time.deltaTime);
 
+        if(moveInputVertical > 0)
+        {
+            isMoving = true;
+        }
+        else
+        {
+            isMoving = false;
+        }
+    }
+
+    private void PlayerMovement()
+    {
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             rb.velocity = new Vector3(0f, velocity * Time.deltaTime, 0f);
