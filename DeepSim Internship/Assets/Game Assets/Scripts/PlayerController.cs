@@ -13,6 +13,11 @@ public class PlayerController : MonoBehaviour
 
     public Rigidbody rb;
 
+    [Header("Skill Values")]
+
+    public int coins;
+    public int kills;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>(); 
@@ -50,6 +55,15 @@ public class PlayerController : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.DownArrow))
         {
             rb.velocity = new Vector3(0f, -velocity * Time.deltaTime, 0f);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Coin"))
+        {
+            coins++;
+            Destroy(other.gameObject);
         }
     }
 }
