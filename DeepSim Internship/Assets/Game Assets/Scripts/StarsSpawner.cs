@@ -5,6 +5,7 @@ using UnityEngine;
 public class StarsSpawner : MonoBehaviour
 {
     public PlayerController playerController;
+    public TypeClass typeClass;
     public List<GameObject> stars = new List<GameObject>();
     public Transform starsSpawnerObj;
     public float destroyTime;
@@ -15,6 +16,7 @@ public class StarsSpawner : MonoBehaviour
     private void Start()
     {
         playerController = FindObjectOfType<PlayerController>();
+        typeClass = FindObjectOfType<TypeClass>();
         allowedToSpawn = false;
     }
 
@@ -35,7 +37,14 @@ public class StarsSpawner : MonoBehaviour
         GameObject objToSpawn = stars[randomNum];
         GameObject objSpawned = Instantiate(objToSpawn, starsSpawnerObj.position, Quaternion.identity);
         StartCoroutine(SetAllowToSpawnToFalse(0.1f));
-        Destroy(objSpawned, destroyTime);
+        if (typeClass.typeClassVal == classType.Obstacle)
+        {
+            Destroy(objSpawned, destroyTime);
+        }
+        else
+        {
+            Debug.Log("Dont kill!");
+        }
     }
 
     private IEnumerator SetAllowToSpawnToFalse(float time)

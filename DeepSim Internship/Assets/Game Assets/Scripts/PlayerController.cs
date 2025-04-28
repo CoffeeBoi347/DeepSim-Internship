@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Skill Values")]
 
+    public float maxDis = 10f;
     public int coins;
     public int kills;
 
@@ -27,13 +28,14 @@ public class PlayerController : MonoBehaviour
     {
         InputControls();
         PlayerMovement();
+        ShootPlayer();
     }
 
     private void InputControls()
     {
         moveInputVertical = Input.GetAxis("Vertical"); // for smoothened movement (W or S)
         moveInputHorizontal = Input.GetAxis("Horizontal"); // for smoothened movement (A or D)
-        rb.velocity = new Vector3(moveInputHorizontal * velocity * Time.deltaTime, 0f, moveInputVertical * velocity * Time.deltaTime);
+        rb.velocity = new Vector3(moveInputHorizontal * velocity, 0f, moveInputVertical * velocity);
 
         if(moveInputVertical > 0)
         {
@@ -49,12 +51,28 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            rb.velocity = new Vector3(0f, velocity * Time.deltaTime, 0f);
+            rb.velocity = new Vector3(0f, velocity, 0f);
         }
 
         else if (Input.GetKeyDown(KeyCode.DownArrow))
         {
-            rb.velocity = new Vector3(0f, -velocity * Time.deltaTime, 0f);
+            rb.velocity = new Vector3(0f, -velocity, 0f);
+        }
+    }
+
+    private void ShootPlayer()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, transform.forward, out hit, maxDis))
+            {
+                if(hit.GetType() == typeof(AIEnemy))
+                {
+                    ActionManager actionManager = FindObjectOfType<ActionManager>();
+                    actionManager.ApplyEffects();
+                }
+            }
         }
     }
 
