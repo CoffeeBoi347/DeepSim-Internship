@@ -35,16 +35,9 @@ public class StarsSpawner : MonoBehaviour
     {
         int randomNum = Random.Range(0, stars.Count);
         GameObject objToSpawn = stars[randomNum];
-        GameObject objSpawned = Instantiate(objToSpawn, starsSpawnerObj.position, Quaternion.identity);
+        Vector3 spawnPosition = new Vector3(transform.position.x, playerController.transform.position.y, transform.position.z);
+        GameObject objSpawned = Instantiate(objToSpawn, spawnPosition, Quaternion.identity);
         StartCoroutine(SetAllowToSpawnToFalse(0.1f));
-        if (typeClass.typeClassVal == classType.Obstacle)
-        {
-            Destroy(objSpawned, destroyTime);
-        }
-        else
-        {
-            Debug.Log("Dont kill!");
-        }
     }
 
     private IEnumerator SetAllowToSpawnToFalse(float time)

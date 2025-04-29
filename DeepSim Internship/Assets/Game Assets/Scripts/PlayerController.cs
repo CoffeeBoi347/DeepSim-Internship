@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public bool hasCollidedWithEnemy = false;
+
     [Header("Speed Values")]
 
     public float velocity;
@@ -18,6 +20,11 @@ public class PlayerController : MonoBehaviour
     public float maxDis = 10f;
     public int coins;
     public int kills;
+
+    [Header("Attack Components")]
+
+    public GameObject bullet;
+    public GameObject attackPos;
 
     private void Start()
     {
@@ -64,15 +71,27 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
+            Instantiate(bullet, attackPos.transform.position, attackPos.transform.rotation, attackPos.transform);
+            Debug.Log("Shooting....!");
             RaycastHit hit;
             if (Physics.Raycast(transform.position, transform.forward, out hit, maxDis))
             {
-                if(hit.GetType() == typeof(AIEnemy))
+                Debug.Log("Enemy is in range!");
+                AIEnemy enemy = hit.collider.GetComponent<AIEnemy>();
+                HealthManager enemyHealth = hit.collider.GetComponent<HealthManager>();
+                if(enemy != null)
                 {
-                    ActionManager actionManager = FindObjectOfType<ActionManager>();
-                    actionManager.ApplyEffects();
+                    enemyHealth.TakeDamage(75f);
                 }
             }
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            hasCollidedWithEnemy = true;
         }
     }
 
@@ -82,6 +101,15 @@ public class PlayerController : MonoBehaviour
         {
             coins++;
             Destroy(other.gameObject);
+        }
+
+        if (other.gameObject.CompareTag("Bullet"))
+        {
+            ActionManager actionManager = FindObjectOfType<ActionManager>();
+            actionManager.ApplyEffects();
+            Debug.Log("REDUCING PLAYER HEALTH NOW!"); 
+            var getHealthComponent = gameObject.GetComponent<HealthManager>();
+            getHealthComponent.TakeDamage(5f);
         }
     }
 }

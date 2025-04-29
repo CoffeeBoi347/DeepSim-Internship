@@ -7,6 +7,7 @@ public class CameraMovement : MonoBehaviour
     public float speed;
     private void Update()
     {
+        target = GameObject.FindGameObjectWithTag("Player");
         Vector3 newPos = target.transform.position + offset;
         Vector3 desiredPos = Vector3.MoveTowards(transform.position, newPos, speed);
         transform.position = desiredPos;    

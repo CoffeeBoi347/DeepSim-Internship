@@ -31,7 +31,7 @@ public class AIEnemy : MonoBehaviour
     public bool isPatrolling = false;
     public bool isAttacking = false;
     public bool isChasing = false;
-
+    public bool canShoot = true;
     private void Start()
     {
         if(playerObj == null)
@@ -64,6 +64,8 @@ public class AIEnemy : MonoBehaviour
         {
             AttackMovement();
         }
+
+        DestroyEnemy();
     }
 
     void IdleMovement()
@@ -93,14 +95,45 @@ public class AIEnemy : MonoBehaviour
         velocity = attackSpeed;
         transform.position += distance * velocity * Time.deltaTime;
         Debug.Log("I AM ATTACKING BRO!");
-        StartCoroutine(ShootBullet(0.5f));
+        if (canShoot)
+        {
+            StartCoroutine(ShootBullet(0.5f));
+        }
+    }
+
+    void DestroyEnemy()
+    {
+        if (HasDied())
+        {
+            GameManager gameManager = FindObjectOfType<GameManager>();
+            gameManager.IncreaseKills();
+        }
+    }
+
+    public bool HasDied()
+    {
+        var enemyHealthManager = GetComponent<HealthManager>();
+        return enemyHealthManager.currentHealth <= 0;
     }
 
     private IEnumerator ShootBullet(float time)
     {
-        yield return new WaitForSeconds(time);
         var bulletSpawned = Instantiate(enemyBullet, shootingPosition.transform.position, Quaternion.identity, bulletsStore.transform);
+        canShoot = false;
+        yield return new WaitForSeconds(time);
+        canShoot = true;
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("BulletPlayer"))
+        {
+            var enemyHealth = GetComponent<HealthManager>();
+            enemyHealth.TakeDamage(30f);
+            Destroy(other.gameObject);
+        }
+    }
+
 }
 
 public enum EnemyBehaviour
