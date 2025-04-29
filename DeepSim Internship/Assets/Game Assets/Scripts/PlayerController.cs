@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -36,6 +37,7 @@ public class PlayerController : MonoBehaviour
         InputControls();
         PlayerMovement();
         ShootPlayer();
+        HasDied();
     }
 
     private void InputControls()
@@ -87,10 +89,28 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void HasDied()
+    {
+        if (HasPlayerDied())
+        {
+            ActionManager actionManager = FindObjectOfType<ActionManager>();
+            actionManager.ApplyEffects();
+            hasCollidedWithEnemy = true;
+        }
+    }
+
+    public bool HasPlayerDied()
+    {
+        var playerHealth = GetComponent<HealthManager>();
+        return playerHealth.currentHealth <= 0;
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
+            ActionManager actionManager = FindObjectOfType<ActionManager>();
+            actionManager.ApplyEffects();
             hasCollidedWithEnemy = true;
         }
     }
@@ -105,8 +125,6 @@ public class PlayerController : MonoBehaviour
 
         if (other.gameObject.CompareTag("Bullet"))
         {
-            ActionManager actionManager = FindObjectOfType<ActionManager>();
-            actionManager.ApplyEffects();
             Debug.Log("REDUCING PLAYER HEALTH NOW!"); 
             var getHealthComponent = gameObject.GetComponent<HealthManager>();
             getHealthComponent.TakeDamage(5f);
